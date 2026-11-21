@@ -7,7 +7,37 @@ from .forms import RegistrationForm
 
 
 def home(request):
-    return render(request, 'home.html')
+    tiles = [
+        {
+            'icon': '01',
+            'value': 'Fast',
+            'title': 'Modern Websites',
+            'description': 'Responsive websites designed to look amazing on every device.',
+            'color': '#2563eb',
+        },
+        {
+            'icon': '02',
+            'value': 'Secure',
+            'title': 'Reliable Systems',
+            'description': 'Stable and secure applications built for long-term business growth.',
+            'color': '#7c3aed',
+        },
+        {
+            'icon': '03',
+            'value': 'Smart',
+            'title': 'Digital Solutions',
+            'description': 'Creative tools that automate work and improve customer experiences.',
+            'color': '#059669',
+        },
+        {
+            'icon': '04',
+            'value': '24/7',
+            'title': 'Dedicated Support',
+            'description': 'Friendly technical support when you need help or need a new feature.',
+            'color': '#ea580c',
+        },
+    ]
+    return render(request, 'home.html', {'tiles': tiles})
 
 def fooder(request):
     return render(request, 'fooder.html')

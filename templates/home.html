@@ -13,12 +13,24 @@
         nav a { color: #111827; text-decoration: none; font-weight: 600; }
         .menu-toggle { display: none; border: 0; background: transparent; color: white; font-size: 1.75rem; cursor: pointer; }
         main { min-height: 60vh; padding: 1rem; }
-        footer { padding: 1rem; background: #111827; color: white; text-align: center; }
+        .hero { max-width: 1100px; margin: 0 auto; text-align: center; padding: 2.5rem 1rem 1.5rem; }
+        .hero h1 { margin-bottom: .75rem; }
+        .hero p { color: #4b5563; }
+        .feature-grid { max-width: 1100px; margin: 1.5rem auto 3rem; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+        .feature-card { position: relative; overflow: hidden; min-height: 180px; padding: 1.25rem; border: 1px solid #e5e7eb; border-radius: 14px; background: white; box-shadow: 0 8px 24px rgba(17, 24, 39, .08); transition: transform .25s ease, box-shadow .25s ease; }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: 0 14px 32px rgba(37, 99, 235, .18); }
+        .feature-card::after { content: ''; position: absolute; width: 90px; height: 90px; right: -35px; bottom: -35px; border-radius: 50%; background: var(--tile-color); opacity: .12; }
+        .feature-icon { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 1rem; border-radius: 12px; color: white; background: var(--tile-color); font-size: 1.35rem; }
+        .feature-card h2 { margin: 0 0 .5rem; font-size: 1.1rem; }
+        .feature-card p { margin: 0; color: #6b7280; line-height: 1.5; }
+        .feature-card strong { display: block; margin-bottom: .35rem; color: var(--tile-color); font-size: 1.5rem; }
 
+        @media (max-width: 900px) { .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (max-width: 600px) {
             .menu-toggle { display: block; }
             nav { display: none; flex-direction: column; align-items: flex-start; }
             nav.open { display: flex; }
+            .feature-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -40,9 +52,21 @@
     </nav>
 
     <main>
-        <h1>Welcome to WISOFT LIMITED</h1>
-        <p>We create modern digital solutions and support businesses with reliable services.</p>
-        <p>This is the home page for the company website.</p>
+        <section class="hero">
+            <h1>Welcome to Wisoft Company Limited</h1>
+            <p>We build fast, secure, and engaging digital experiences for modern businesses.</p>
+        </section>
+
+        <section class="feature-grid" aria-label="Our capabilities">
+            {% for tile in tiles %}
+            <article class="feature-card" style="--tile-color: {{ tile.color }}">
+                <div class="feature-icon">{{ tile.icon }}</div>
+                <strong>{{ tile.value }}</strong>
+                <h2>{{ tile.title }}</h2>
+                <p>{{ tile.description }}</p>
+            </article>
+            {% endfor %}
+        </section>
     </main>
 
     <script>

@@ -30,9 +30,6 @@
 
     <nav id="main-navigation">
         <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/services">Services</a>
-        <a href="/contact">Contact</a>
         {% if session.user_email %}
             <span>Welcome, {{ session.user_name }}</span>
             <a href="/dashboard">Dashboard</a>

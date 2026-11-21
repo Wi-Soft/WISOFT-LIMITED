@@ -4,48 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account | WISOFT LIMITED</title>
-
-</head>
-<body>
-    <header><h1>WISOFT LIMITED</h1></header>
-
-    <main class="container">
-        <h2>Create Account</h2>
-        {% if error %}<p class="error">{{ error }}</p>{% endif %}
-        <form method="POST">
-            <div class="form-group">
-                <label for="full_name">Full Name*</label>
-                <input class="form-control" id="full_name" name="full_name" maxlength="150" placeholder="Enter your full name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email Address*</label>
-                <input class="form-control" id="email" name="email" type="email" placeholder="Enter your Email Address" required>
-            </div>
-            <div class="form-group">
-                <label for="phone_number">Phone Number*</label>
-                <input class="form-control" id="phone_number" name="phone_number" maxlength="20" placeholder="Enter your Phone Number" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password*</label>
-                <input class="form-control" id="password" name="password" type="password" minlength="8" placeholder="Create a password" required>
-            </div>
-            <div class="form-check">
-                <input id="agree_terms" name="agree_terms" type="checkbox" required>
-                <label for="agree_terms">I agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a></label>
-            </div>
-            <button type="submit" class="btn-create">Create Account &rarr;</button>
-        </form>
-        <p>Already have an account? <a href="/signin">Sign in</a></p>
-    </main>
-</body>
-</html>
-
     <style>
         body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #111827; color: white; }
         header h1 { margin: 0; font-size: 1.25rem; }
-        nav { display: flex; gap: 1rem; padding: 0.75rem 1rem; background: white; }
-        nav a { color: #111827; text-decoration: none; font-weight: 600; }
         .container { max-width: 520px; margin: 3rem auto; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
         .form-group { margin-bottom: 1rem; }
         label { display: block; margin-bottom: .4rem; font-weight: 600; }
@@ -55,3 +17,41 @@
         .btn-create { width: 100%; padding: .8rem; border: 0; border-radius: 6px; background: #2563eb; color: white; font-weight: 700; cursor: pointer; }
         .error { padding: .75rem; border-radius: 6px; background: #fee2e2; color: #991b1b; }
     </style>
+</head>
+<body>
+    <header><h1>WISOFT LIMITED</h1></header>
+    <main class="container">
+        <h2>Create Account</h2>
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+            {% endfor %}
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Full Name*</label>
+                {{ form.full_name }}
+            </div>
+            <div class="form-group">
+                <label>Email Address*</label>
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label>Phone Number*</label>
+                {{ form.phone_number }}
+            </div>
+            <div class="form-group">
+                <label>Password*</label>
+                {{ form.password }}
+            </div>
+            <div class="form-check">
+                {{ form.agree_terms }}
+                <label>I agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a></label>
+            </div>
+            <button type="submit" class="btn-create">Create Account &rarr;</button>
+        </form>
+        <p>Already have an account? <a href="{% url 'signin' %}">Sign in</a></p>
+    </main>
+</body>
+</html>

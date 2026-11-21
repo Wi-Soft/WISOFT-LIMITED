@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT}"]
+CMD ["sh", "-c", "gunicorn wisoft_project.wsgi:application --bind 0.0.0.0:${PORT}"]

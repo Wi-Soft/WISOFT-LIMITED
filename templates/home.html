@@ -33,6 +33,13 @@
         <a href="/about">About</a>
         <a href="/services">Services</a>
         <a href="/contact">Contact</a>
+        {% if session.user_email %}
+            <span>Welcome, {{ session.user_name }}</span>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/signin">Sign In</a>
+            <a href="/signup">Sign Up</a>
+        {% endif %}
     </nav>
 
     <main>
@@ -51,7 +58,7 @@
 
         menuToggle.addEventListener('click', () => {
             const isOpen = navigation.classList.toggle('open');
-            menuToggle.setAttribute('aria-expanded', isOpen);
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
         });
     </script>
 </body>

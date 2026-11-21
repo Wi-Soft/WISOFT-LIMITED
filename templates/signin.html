@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | WISOFT LIMITED</title>
+ 
+</head>
+<body>
+    <header><h1>WISOFT LIMITED</h1></header>
+    <nav>
+        <a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/signup">Sign Up</a>
+    </nav>
+    <main class="container">
+        <h2>Sign In</h2>
+        {% if error %}<p class="error">{{ error }}</p>{% endif %}
+        <form method="POST">
+            <div class="form-group">
+                <label for="email">Email Address*</label>
+                <input class="form-control" id="email" name="email" type="email" placeholder="Enter your Email Address" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password*</label>
+                <input class="form-control" id="password" name="password" type="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn-create">Sign In &rarr;</button>
+        </form>
+        <p>Need an account? <a href="/signup">Create Account</a></p>
+    </main>
+</body>
+</html>
+   <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #111827; color: white; }
+        header h1 { margin: 0; font-size: 1.25rem; }
+        nav { display: flex; gap: 1rem; padding: 0.75rem 1rem; background: white; }
+        nav a { color: #111827; text-decoration: none; font-weight: 600; }
+        .container { max-width: 420px; margin: 3rem auto; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: .4rem; font-weight: 600; }
+        .form-control { width: 100%; box-sizing: border-box; padding: .75rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        .btn-create { width: 100%; padding: .8rem; border: 0; border-radius: 6px; background: #2563eb; color: white; font-weight: 700; cursor: pointer; }
+        .error { padding: .75rem; border-radius: 6px; background: #fee2e2; color: #991b1b; }
+    </style>

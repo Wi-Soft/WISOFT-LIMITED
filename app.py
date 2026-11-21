@@ -91,11 +91,21 @@ def signin():
         if user and check_password_hash(user["password_hash"], password):
             session["user_email"] = user["email"]
             session["user_name"] = user["full_name"]
-            return redirect(url_for("home"))
+            next_page = request.args.get("next")
+            if next_page and next_page.startswith("/"):
+                return redirect(next_page)
+            return redirect(url_for("dashboard"))
 
         error = "Invalid email address or password."
 
     return render_template("signin.html", error=error)
+
+
+@app.route("/dashboard")
+def dashboard():
+    if not session.get("user_email"):
+        return redirect(url_for("signin", next=request.path))
+    return render_template("dashboard.html")
 
 
 @app.route("/logout")

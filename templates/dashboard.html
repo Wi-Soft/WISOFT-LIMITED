@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | WISOFT LIMITED</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #111827; color: white; }
+        header h1 { margin: 0; font-size: 1.25rem; }
+        nav { display: flex; gap: 1rem; padding: 0.75rem 1rem; background: white; }
+        nav a { color: #111827; text-decoration: none; font-weight: 600; }
+        main { max-width: 900px; margin: 2rem auto; padding: 2rem; }
+        .card { padding: 1.5rem; background: white; border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WISOFT LIMITED</h1>
+        <a href="/logout" style="color:white">Logout</a>
+    </header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/services">Services</a>
+        <a href="/dashboard">Dashboard</a>
+    </nav>
+    <main>
+        <div class="card">
+            <h2>Welcome, {{ session.user_name }}</h2>
+            <p>This is your protected dashboard.</p>
+            <p><strong>Account email:</strong> {{ session.user_email }}</p>
+        </div>
+    </main>
+</body>
+</html>

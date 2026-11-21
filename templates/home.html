@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WISOFT LIMITED | Home</title>
+    <title>WISOFT LIMITED</title>
     <style>
         body { margin: 0; font-family: Arial, sans-serif; }
         header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #111827; color: white; }
         header h1 { margin: 0; font-size: 1.25rem; }
-        nav { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; background: #f3f4f6; }
+        nav { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; padding: 0.75rem 1rem; background: #f3f4f6; }
         nav a { color: #111827; text-decoration: none; font-weight: 600; }
         .menu-toggle { display: none; border: 0; background: transparent; color: white; font-size: 1.75rem; cursor: pointer; }
         main { min-height: 60vh; padding: 1rem; }
@@ -29,7 +29,6 @@
     </header>
 
     <nav id="main-navigation">
-        <a href="/">Home</a>
         {% if session.user_email %}
             <span>Welcome, {{ session.user_name }}</span>
             <a href="/dashboard">Dashboard</a>
@@ -45,7 +44,6 @@
         <p>We create modern digital solutions and support businesses with reliable services.</p>
         <p>This is the home page for the company website.</p>
     </main>
-    {% include 'fooder.html' %}
 
     <script>
         const menuToggle = document.querySelector('.menu-toggle');

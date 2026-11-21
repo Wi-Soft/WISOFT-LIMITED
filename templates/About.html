@@ -4,16 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About | WISOFT LIMITED</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #111827; color: white; }
+        header h1 { margin: 0; font-size: 1.25rem; }
+        nav { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; background: #f3f4f6; }
+        nav a { color: #111827; text-decoration: none; font-weight: 600; }
+        .menu-toggle { display: none; border: 0; background: transparent; color: white; font-size: 1.75rem; cursor: pointer; }
+        main { min-height: 60vh; padding: 1rem; }
+
+        @media (max-width: 600px) {
+            .menu-toggle { display: block; }
+            nav { display: none; flex-direction: column; align-items: flex-start; }
+            nav.open { display: flex; }
+        }
+    </style>
 </head>
 <body>
-    <nav>
+    <header>
+        <h1>WISOFT LIMITED</h1>
+        <button class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="main-navigation">☰</button>
+    </header>
+
+    <nav id="main-navigation">
         <a href="/">Home</a>
         <a href="/about">About</a>
         <a href="/services">Services</a>
     </nav>
 
-    <h1>About Us</h1>
-    <p>WISOFT LIMITED is a technology-focused company dedicated to delivering professional digital services.</p>
-    <p>We work with businesses that want dependable, innovative, and well-designed solutions.</p>
+    <main>
+        <h1>About Us</h1>
+        <p>WISOFT LIMITED is a technology-focused company dedicated to delivering professional digital services.</p>
+        <p>We work with businesses that want dependable, innovative, and well-designed solutions.</p>
+    </main>
+
+    <script>
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navigation = document.querySelector('#main-navigation');
+
+        menuToggle.addEventListener('click', () => {
+            const isOpen = navigation.classList.toggle('open');
+            menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+    </script>
 </body>
 </html>

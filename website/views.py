@@ -10,6 +10,9 @@ from .forms import RegistrationForm
 def home(request):
     return render(request, 'home.html')
 
+def fooder(request):
+    return render(request, 'fooder.html')
+
 
 def about(request):
     return render(request, 'About.html')

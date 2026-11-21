@@ -29,8 +29,9 @@
         <div class="card">
             <h2>Welcome, {{ session.user_name }}</h2>
             <p>This is your protected dashboard.</p>
-            <p><strong>Account email:</strong> {{ session.user_email }}</p>
         </div>
     </main>
 </body>
+    {% include 'fooder.html' %}
+
 </html>

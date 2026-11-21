@@ -1,10 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 
-class RegistrationForm(UserCreationForm):
+class RegistrationForm(forms.Form):
     full_name = forms.CharField(
         max_length=150,
         widget=forms.TextInput(attrs={'placeholder': 'Enter your full name', 'class': 'form-control'}),
@@ -26,6 +25,19 @@ class RegistrationForm(UserCreationForm):
         error_messages={'required': 'You must agree to the Terms & Conditions and Privacy Policy.'},
     )
 
-    class Meta:
-        model = User
-        fields = ('username', 'email')
+    def clean_full_name(self):
+        return self.cleaned_data['full_name'].strip()
+
+    def clean_email(self):
+        return self.cleaned_data['email'].strip().lower()
+
+    def clean_phone_number(self):
+        return self.cleaned_data['phone_number'].strip()
+
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        try:
+            validate_password(password)
+        except ValidationError as error:
+            raise forms.ValidationError(error.messages)
+        return password

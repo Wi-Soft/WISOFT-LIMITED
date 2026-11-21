@@ -3,33 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | WISOFT LIMITED</title>
-    <style>
-        body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #111827; color: white; }
-        header h1 { margin: 0; font-size: 1.25rem; }
-        nav { display: flex; gap: 1rem; padding: 0.75rem 1rem; background: white; }
-        nav a { color: #111827; text-decoration: none; font-weight: 600; }
-        main { max-width: 900px; margin: 2rem auto; padding: 2rem; }
-        .card { padding: 1.5rem; background: white; border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
-    </style>
+    <title>Company Dashboard</title>
+    <link href="https://jsdelivr.net" rel="stylesheet">
 </head>
-<body>
-    <header>
-        <h1>WISOFT LIMITED</h1>
-        <a href="/logout" style="color:white">Logout</a>
-    </header>
-    <nav>
-        <a href="/about">About</a>
-        <a href="/services">Services</a>
-        <a href="/dashboard">Dashboard</a>
-    </nav>
-    <main>
-        <div class="card">
-            <h2>Welcome, {{ session.user_name }}</h2>
-            <p>This is your protected dashboard.</p>
-        </div>
-    </main>
-</body>
+<body class="bg-light">
 
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Dashboard Overview</h2>
+        <span class="text-muted">Welcome, {{ request.user.username }}</span>
+    </div>
+
+    <!-- Dashboard Tiles Grid -->
+    <div class="row g-4">
+        {% for tile in tiles %}
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted text-uppercase small fw-semibold mb-1">
+                        {{ tile.title }}
+                    </p>
+                    <h3 class="fw-bold mb-2">{{ tile.value }}</h3>
+                    <span class="badge bg-{{ tile.badge_color }} bg-opacity-10 text-{{ tile.badge_color }}">
+                        {{ tile.subtitle }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
 </html>

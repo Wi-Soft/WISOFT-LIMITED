@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
-
 from .forms import RegistrationForm
 
 
@@ -13,7 +12,6 @@ def home(request):
 def fooder(request):
     return render(request, 'fooder.html')
 
-
 def about(request):
     return render(request, 'About.html')
 
@@ -21,6 +19,40 @@ def about(request):
 def services(request):
     return render(request, 'Services.html')
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def dashboard_view(request):
+    # Replace these static values with database queries (e.g., Order.objects.count())
+    tiles = [
+        {
+            "title": "Monthly Visitors",
+            "value": "24,500",
+            "subtitle": "+12% vs last month",
+            "badge_color": "success",
+        },
+        {
+            "title": "Today's Revenue",
+            "value": "KES 145,000",
+            "subtitle": "14 completed orders",
+            "badge_color": "primary",
+        },
+        {
+            "title": "New Inquiries",
+            "value": "18",
+            "subtitle": "5 unread messages",
+            "badge_color": "warning",
+        },
+        {
+            "title": "Open Support Tickets",
+            "value": "5",
+            "subtitle": "2 high priority",
+            "badge_color": "danger",
+        },
+    ]
+
+    return render(request, "dashboard.html", {"tiles": tiles})
 
 def register(request):
     if request.method == 'POST':

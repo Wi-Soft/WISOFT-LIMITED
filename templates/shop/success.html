@@ -1,0 +1,5 @@
+{% extends 'shop/base.html' %}
+{% block title %}Order Successful | TileHouse{% endblock %}
+{% block content %}
+<section class="container"><div style="max-width:600px;margin:auto;background:white;padding:40px;text-align:center;border-radius:8px"><h1 style="color:#269a65">✓</h1><h2>Order Placed Successfully</h2><p>Order Number: #{{ order.id }}</p><p>Customer: {{ order.customer_name }}</p><p>Phone: {{ order.phone }}</p><p><strong>Total: KSh {{ order.total_amount|floatformat:2 }}</strong></p><p>Status: {{ order.status }}</p><a class="btn" href="{% url 'tile_shop' %}">Continue Shopping</a></div></section>
+{% endblock %}

@@ -4,6 +4,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import RegistrationForm
+from django.db import transaction
+from django.db.models import Q
+from decimal import Decimal
 
 
 def home(request):
@@ -444,3 +447,147 @@ def my_orders(request):
 
     orders = CustomerOrder.objects.filter(customer=request.user).prefetch_related('items__product').order_by('-created_at')
     return render(request, 'orders.html', {'orders': orders})
+
+def tile_shop(request):
+    from .models import Tile
+
+    tiles = Tile.objects.all().order_by('-created_at')
+    search = request.GET.get('search', '').strip()
+    category = request.GET.get('category', '').strip()
+
+    if search:
+        tiles = tiles.filter(Q(name__icontains=search) | Q(brand__icontains=search) | Q(material__icontains=search) | Q(color__icontains=search))
+    if category:
+        tiles = tiles.filter(category__iexact=category)
+
+    cart = request.session.get('tile_cart', {})
+    context = {
+        'tiles': tiles,
+        'categories': Tile.objects.values_list('category', flat=True).distinct(),
+        'cart_count': sum(int(value) for value in cart.values()),
+        'search': search,
+        'selected_category': category,
+    }
+    return render(request, 'shop/home.html', context)
+
+
+def add_tile_to_cart(request, tile_id):
+    from django.contrib import messages
+    from .models import Tile
+
+    if request.method == 'POST':
+        tile = get_object_or_404(Tile, id=tile_id)
+        cart = request.session.get('tile_cart', {})
+        key = str(tile.id)
+        current = int(cart.get(key, 0))
+        if tile.stock <= 0:
+            messages.error(request, 'This tile is out of stock.')
+        elif current >= tile.stock:
+            messages.error(request, 'Not enough stock available.')
+        else:
+            cart[key] = current + 1
+            request.session['tile_cart'] = cart
+            request.session.modified = True
+            messages.success(request, 'Tile added to cart.')
+    return redirect('tile_shop')
+
+
+def tile_cart(request):
+    from .models import Tile
+
+    cart = request.session.get('tile_cart', {})
+    items = []
+    total = Decimal('0.00')
+
+    for tile_id, quantity in cart.items():
+        tile = Tile.objects.filter(id=tile_id).first()
+        if tile:
+            quantity = int(quantity)
+            subtotal = tile.price * quantity
+            total += subtotal
+            items.append({'tile': tile, 'quantity': quantity, 'subtotal': subtotal})
+
+    return render(request, 'shop/cart.html', {'cart_items': items, 'total': total, 'cart_count': sum(int(value) for value in cart.values())})
+
+
+def update_tile_cart(request, tile_id):
+    from django.contrib import messages
+    from .models import Tile
+
+    if request.method == 'POST':
+        tile = get_object_or_404(Tile, id=tile_id)
+        cart = request.session.get('tile_cart', {})
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+        except (TypeError, ValueError):
+            quantity = 0
+
+        if quantity <= 0:
+            cart.pop(str(tile_id), None)
+            messages.success(request, 'Tile removed.')
+        elif quantity <= tile.stock:
+            cart[str(tile_id)] = quantity
+            messages.success(request, 'Cart updated.')
+        else:
+            messages.error(request, f'Only {tile.stock} tiles are available.')
+
+        request.session['tile_cart'] = cart
+        request.session.modified = True
+    return redirect('tile_cart')
+
+
+def remove_tile_from_cart(request, tile_id):
+    if request.method == 'POST':
+        cart = request.session.get('tile_cart', {})
+        cart.pop(str(tile_id), None)
+        request.session['tile_cart'] = cart
+        request.session.modified = True
+    return redirect('tile_cart')
+
+
+def tile_checkout(request):
+    from django.contrib import messages
+    from .models import Tile, TileShopOrder, TileShopOrderItem
+
+    cart = request.session.get('tile_cart', {})
+    if not cart:
+        messages.error(request, 'Your cart is empty.')
+        return redirect('tile_shop')
+
+    if request.method == 'POST':
+        customer_name = request.POST.get('customer_name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        email = request.POST.get('email', '').strip()
+        address = request.POST.get('address', '').strip()
+
+        if not all((customer_name, phone, email, address)):
+            messages.error(request, 'Please complete all checkout fields.')
+            return redirect('tile_checkout')
+
+        try:
+            with transaction.atomic():
+                total = Decimal('0.00')
+                order_lines = []
+                for tile_id, quantity in cart.items():
+                    tile = Tile.objects.select_for_update().get(id=tile_id)
+                    quantity = int(quantity)
+                    if quantity < 1 or tile.stock < quantity:
+                        raise ValueError(f'Insufficient stock for {tile.name}.')
+                    total += tile.price * quantity
+                    order_lines.append((tile, quantity))
+
+                order = TileShopOrder.objects.create(customer_name=customer_name, phone=phone, email=email, address=address, total_amount=total)
+                for tile, quantity in order_lines:
+                    TileShopOrderItem.objects.create(order=order, tile=tile, quantity=quantity, price=tile.price)
+                    tile.stock -= quantity
+                    tile.save(update_fields=['stock'])
+
+            request.session['tile_cart'] = {}
+            request.session.modified = True
+            return render(request, 'shop/success.html', {'order': order, 'cart_count': 0})
+        except (Tile.DoesNotExist, ValueError) as error:
+            messages.error(request, str(error))
+        except Exception:
+            messages.error(request, 'Unable to place your order. Please try again.')
+
+    return render(request, 'shop/checkout.html', {'cart_count': sum(int(value) for value in cart.values())})

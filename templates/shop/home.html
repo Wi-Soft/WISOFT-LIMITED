@@ -1,0 +1,19 @@
+{% extends 'shop/base.html' %}
+{% block title %}Shop Tiles | TileHouse{% endblock %}
+{% block content %}
+<section style="background:#263e5c;color:white;padding:70px 8%"><h1>Discover Beautiful Tiles</h1><p>Premium tiles for homes, offices and commercial spaces.</p></section>
+<section class="container">
+    <form class="search" method="get"><input name="search" value="{{ search }}" placeholder="Search tiles"><button class="btn" type="submit">Search</button></form>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:25px"><a class="btn" href="{% url 'tile_shop' %}">All</a>{% for category in categories %}<a class="btn" href="?category={{ category|urlencode }}">{{ category }}</a>{% endfor %}</div>
+    <div class="grid">
+    {% for tile in tiles %}
+        <article class="card">
+            {% if tile.image_url %}<img src="{{ tile.image_url }}" alt="{{ tile.name }}">{% else %}<img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600" alt="Tile">{% endif %}
+            <div class="card-body"><h3>{{ tile.name }}</h3><p>{{ tile.brand }} · {{ tile.size }}</p><p>{{ tile.material }} · {{ tile.color }} · {{ tile.finish }}</p><p class="price">KSh {{ tile.price|floatformat:2 }}</p><p>{% if tile.stock > 0 %}{{ tile.stock }} available{% else %}Out of stock{% endif %}</p>
+            <form method="post" action="{% url 'add_tile_to_cart' tile.id %}">{% csrf_token %}<button class="btn" type="submit" {% if tile.stock == 0 %}disabled{% endif %}>Add to Cart</button></form>
+            </div>
+        </article>
+    {% empty %}<p>No tiles found.</p>{% endfor %}
+    </div>
+</section>
+{% endblock %}

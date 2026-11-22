@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Product, StockMovement, PortfolioRating, CustomerOrder, OrderItem
+from .models import Category, Product, StockMovement, PortfolioRating, CustomerOrder, OrderItem, Tile, TileShopOrder, TileShopOrderItem
 
 
 @admin.register(Category)
@@ -31,8 +31,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(StockMovement)
 class StockMovementAdmin(admin.ModelAdmin):
-    list_display = ('product', 'movement_type', 'quantity', 'created_at')
-    list_filter = ('movement_type',)
+    list_display = ('product', 'movement_type', 'quantity', 'status', 'created_at')
+    list_filter = ('movement_type', 'status')
+    list_editable = ('status',)
 
 
 @admin.register(PortfolioRating)
@@ -54,3 +55,24 @@ class CustomerOrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'created_at')
     search_fields = ('customer__username', 'full_name', 'phone', 'address')
     inlines = [OrderItemInline]
+
+
+@admin.register(Tile)
+class TileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'brand', 'category', 'size', 'price', 'stock')
+    search_fields = ('name', 'brand', 'category')
+    list_filter = ('category', 'material', 'finish')
+
+
+class TileShopOrderItemInline(admin.TabularInline):
+    model = TileShopOrderItem
+    extra = 0
+    readonly_fields = ('tile', 'quantity', 'price')
+
+
+@admin.register(TileShopOrder)
+class TileShopOrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer_name', 'phone', 'total_amount', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('customer_name', 'phone', 'email')
+    inlines = [TileShopOrderItemInline]

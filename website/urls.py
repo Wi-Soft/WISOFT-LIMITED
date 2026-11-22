@@ -19,4 +19,10 @@ urlpatterns = [
     path('cart/update/<int:product_id>/', views.update_cart, name='update_cart'),
     path('checkout/', views.checkout, name='checkout'),
     path('my-orders/', views.my_orders, name='my_orders'),
+    path('tile-shop/', views.tile_shop, name='tile_shop'),
+    path('tile-shop/cart/', views.tile_cart, name='tile_cart'),
+    path('tile-shop/cart/add/<int:tile_id>/', views.add_tile_to_cart, name='add_tile_to_cart'),
+    path('tile-shop/cart/update/<int:tile_id>/', views.update_tile_cart, name='update_tile_cart'),
+    path('tile-shop/cart/remove/<int:tile_id>/', views.remove_tile_from_cart, name='remove_tile_from_cart'),
+    path('tile-shop/checkout/', views.tile_checkout, name='tile_checkout'),
 ]

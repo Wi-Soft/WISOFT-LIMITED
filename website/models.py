@@ -37,6 +37,11 @@ class StockMovement(models.Model):
     movement_type = models.CharField(max_length=3, choices=TYPES)
     quantity = models.IntegerField()
     note = models.CharField(max_length=255, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[('PENDING', 'Pending'), ('APPROVED', 'Approved')],
+        default='PENDING',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
@@ -90,3 +95,43 @@ class OrderItem(models.Model):
     @property
     def total_amount(self):
         return self.product.price * self.quantity
+
+class Tile(models.Model):
+    name = models.CharField(max_length=200)
+    brand = models.CharField(max_length=100)
+    category = models.CharField(max_length=100)
+    size = models.CharField(max_length=50)
+    material = models.CharField(max_length=100)
+    color = models.CharField(max_length=100)
+    finish = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    stock = models.PositiveIntegerField(default=0)
+    image_url = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class TileShopOrder(models.Model):
+    customer_name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    address = models.TextField()
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    status = models.CharField(max_length=30, default='Pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Order #{self.id} - {self.customer_name}'
+
+
+class TileShopOrderItem(models.Model):
+    order = models.ForeignKey(TileShopOrder, on_delete=models.CASCADE, related_name='items')
+    tile = models.ForeignKey(Tile, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.tile.name} x {self.quantity}'

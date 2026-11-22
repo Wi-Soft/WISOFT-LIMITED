@@ -1,0 +1,5 @@
+{% extends 'shop/base.html' %}
+{% block title %}Checkout | TileHouse{% endblock %}
+{% block content %}
+<section class="container"><div style="max-width:600px;margin:auto;background:white;padding:30px;border-radius:8px"><h2>Customer Checkout</h2><form method="post">{% csrf_token %}<label>Full Name</label><input name="customer_name" required style="width:100%;padding:12px;margin:8px 0 18px"><label>Phone Number</label><input name="phone" required style="width:100%;padding:12px;margin:8px 0 18px"><label>Email Address</label><input type="email" name="email" required style="width:100%;padding:12px;margin:8px 0 18px"><label>Delivery Address</label><textarea name="address" rows="4" required style="width:100%;padding:12px;margin:8px 0 18px"></textarea><button class="btn" type="submit" style="width:100%">Place Order</button></form></div></section>
+{% endblock %}

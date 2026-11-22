@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WISOFT LIMITED</title>
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; }
+        body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; font-family: Arial, sans-serif; }
         header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #111827; color: white; }
         header h1 { margin: 0; font-size: 1.25rem; }
         nav { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; padding: 0.75rem 1rem; background: #f3f4f6; }
         nav a { color: #111827; text-decoration: none; font-weight: 600; }
         .menu-toggle { display: none; border: 0; background: transparent; color: white; font-size: 1.75rem; cursor: pointer; }
-        main { min-height: 60vh; padding: 1rem; }
+        main { flex: 1; min-height: 60vh; padding: 1rem; }
+        footer { width: 100%; padding: 1.5rem 1rem; background: #111827; color: #d1d5db; text-align: center; }
+        footer a { color: #e5e7eb; text-decoration: none; }
         .hero { max-width: 1100px; margin: 0 auto; text-align: center; padding: 2.5rem 1rem 1.5rem; }
         .hero h1 { margin-bottom: .75rem; }
         .hero p { color: #4b5563; }
@@ -98,6 +100,19 @@
             {% endif %}
         </section>
     </main>
+
+    <footer>
+        <strong>WISOFT LIMITED</strong>
+        <p style="margin:.5rem 0">Modern tiles and reliable digital solutions.</p>
+        <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'buy' %}">Buy Tiles</a>
+            <a href="{% url 'cart' %}">Cart</a>
+            <a href="{% url 'my_orders' %}">My Orders</a>
+            {% if request.user.is_authenticated %}<a href="{% url 'dashboard' %}">Dashboard</a>{% endif %}
+        </div>
+        <p style="margin:.75rem 0 0;font-size:.875rem">&copy; {% now "Y" %} WISOFT LIMITED. All rights reserved.</p>
+    </footer>
 
     <script>
         const menuToggle = document.querySelector('.menu-toggle');

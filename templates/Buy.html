@@ -16,7 +16,10 @@
     <header class="page-header">
         <div class="container d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0">Buy Tiles</h1>
-            <a href="{% url 'dashboard' %}" class="btn btn-light">Dashboard</a>
+            <div class="d-flex gap-2">
+                <a href="{% url 'cart' %}" class="btn btn-light">Cart</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-light">Dashboard</a>
+            </div>
         </div>
     </header>
 
@@ -55,13 +58,13 @@
                         <p class="small mb-2">{{ product.description }}</p>
                         {% endif %}
                         <p class="fw-bold text-primary mb-1">KSh {{ product.price }}</p>
-                        <form method="post" onsubmit="return confirm('Do you want to order ' + this.elements.quantity.value + ' unit(s) of {{ product.name|escapejs }}?')">
+                        <form method="post" action="{% url 'add_to_cart' product.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="product" value="{{ product.id }}">
                             <label class="form-label fw-bold" for="quantity-{{ product.id }}">Quantity</label>
                             <input id="quantity-{{ product.id }}" class="form-control mb-2 quantity-input" type="number" name="quantity" min="1" max="{{ product.stock }}" value="1" data-price="{{ product.price }}" data-total="total-{{ product.id }}" required>
                             <p class="fw-bold">Total: <span id="total-{{ product.id }}" class="text-primary">KSh {{ product.price }}</span></p>
-                            <button type="submit" class="btn btn-primary w-100" {% if product.stock < 1 %}disabled{% endif %}>Order Now</button>
+                            <button type="submit" class="btn btn-primary w-100" {% if product.stock < 1 %}disabled{% endif %}>Add to Cart</button>
                         </form>
                     </div>
                 </article>

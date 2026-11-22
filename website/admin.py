@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Product, StockMovement, PortfolioRating
+from .models import Category, Product, StockMovement, PortfolioRating, CustomerOrder, OrderItem
 
 
 @admin.register(Category)
@@ -40,3 +40,17 @@ class PortfolioRatingAdmin(admin.ModelAdmin):
     list_display = ('user', 'rating', 'created_at')
     list_filter = ('rating',)
     search_fields = ('user__username', 'comment')
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ('product', 'quantity', 'total_amount')
+
+
+@admin.register(CustomerOrder)
+class CustomerOrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer', 'status', 'full_name', 'phone', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('customer__username', 'full_name', 'phone', 'address')
+    inlines = [OrderItemInline]

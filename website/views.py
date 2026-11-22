@@ -301,3 +301,146 @@ def buy(request):
         products = products.filter(name__icontains=search)
 
     return render(request, 'Buy.html', {'products': products, 'search': search})
+
+@login_required(login_url='signin')
+def cart(request):
+    from .models import Product
+
+    cart_items = request.session.get('cart', {})
+    items = []
+    grand_total = 0
+
+    for product_id, quantity in cart_items.items():
+        product = Product.objects.filter(id=product_id).first()
+        if product:
+            quantity = int(quantity)
+            total = product.price * quantity
+            grand_total += total
+            items.append({'product': product, 'quantity': quantity, 'total': total})
+
+    return render(request, 'cart.html', {'cart_items': items, 'grand_total': grand_total})
+
+
+@login_required(login_url='signin')
+def add_to_cart(request, product_id):
+    from django.contrib import messages
+    from .models import Product
+
+    product = get_object_or_404(Product, id=product_id)
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+    except (TypeError, ValueError):
+        quantity = 1
+
+    if quantity < 1:
+        messages.error(request, 'Please enter a valid quantity.')
+    elif quantity > product.stock:
+        messages.error(request, f'Only {product.stock} units are available.')
+    else:
+        cart = request.session.get('cart', {})
+        current = int(cart.get(str(product_id), 0))
+        new_quantity = current + quantity
+        if new_quantity > product.stock:
+            messages.error(request, f'Only {product.stock} units are available.')
+        else:
+            cart[str(product_id)] = new_quantity
+            request.session['cart'] = cart
+            messages.success(request, f'{product.name} added to your cart.')
+
+    return redirect(request.POST.get('next', 'cart'))
+
+
+@login_required(login_url='signin')
+def update_cart(request, product_id):
+    from django.contrib import messages
+    from .models import Product
+
+    product = get_object_or_404(Product, id=product_id)
+    try:
+        quantity = int(request.POST.get('quantity', 0))
+    except (TypeError, ValueError):
+        quantity = 0
+
+    cart = request.session.get('cart', {})
+    if quantity < 1:
+        cart.pop(str(product_id), None)
+        messages.success(request, f'{product.name} removed from your cart.')
+    elif quantity > product.stock:
+        messages.error(request, f'Only {product.stock} units are available.')
+    else:
+        cart[str(product_id)] = quantity
+        messages.success(request, 'Cart quantity updated.')
+
+    request.session['cart'] = cart
+    return redirect('cart')
+
+
+@login_required(login_url='signin')
+def checkout(request):
+    from django.contrib import messages
+    from .models import CustomerOrder, OrderItem, Product, StockMovement
+
+    cart = request.session.get('cart', {})
+    if not cart:
+        messages.error(request, 'Your cart is empty.')
+        return redirect('cart')
+
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        address = request.POST.get('address', '').strip()
+
+        if not all((full_name, phone, address)):
+            messages.error(request, 'Please complete all checkout details.')
+        else:
+            order = CustomerOrder.objects.create(
+                customer=request.user,
+                full_name=full_name,
+                phone=phone,
+                address=address,
+            )
+
+            for product_id, quantity in cart.items():
+                product = Product.objects.filter(id=product_id).first()
+                quantity = int(quantity)
+                if not product or quantity < 1 or quantity > product.stock:
+                    order.delete()
+                    messages.error(request, 'A product in your cart is no longer available.')
+                    return redirect('cart')
+
+            for product_id, quantity in cart.items():
+                product = Product.objects.get(id=product_id)
+                quantity = int(quantity)
+                OrderItem.objects.create(order=order, product=product, quantity=quantity)
+                product.stock -= quantity
+                product.save(update_fields=['stock'])
+                StockMovement.objects.create(
+                    product=product,
+                    movement_type='OUT',
+                    quantity=quantity,
+                    note=f'Customer checkout order #{order.id}',
+                )
+
+            request.session['cart'] = {}
+            messages.success(request, f'Order #{order.id} placed successfully. We will process it shortly.')
+            return redirect('my_orders')
+
+    cart_items = []
+    grand_total = 0
+    for product_id, quantity in cart.items():
+        product = Product.objects.filter(id=product_id).first()
+        if product:
+            quantity = int(quantity)
+            total = product.price * quantity
+            grand_total += total
+            cart_items.append({'product': product, 'quantity': quantity, 'total': total})
+
+    return render(request, 'checkout.html', {'cart_items': cart_items, 'grand_total': grand_total})
+
+
+@login_required(login_url='signin')
+def my_orders(request):
+    from .models import CustomerOrder
+
+    orders = CustomerOrder.objects.filter(customer=request.user).prefetch_related('items__product').order_by('-created_at')
+    return render(request, 'orders.html', {'orders': orders})

@@ -56,3 +56,37 @@ class PortfolioRating(models.Model):
 
     def __str__(self):
         return f'{self.user.username}: {self.rating}/5'
+
+class CustomerOrder(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('PROCESSING', 'Processing'),
+        ('COMPLETED', 'Completed'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='customer_orders')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    full_name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=30)
+    address = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Order #{self.id} - {self.customer.username}'
+
+    @property
+    def total_amount(self):
+        return sum(item.total_amount for item in self.items.all())
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(CustomerOrder, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f'{self.product.name} x {self.quantity}'
+
+    @property
+    def total_amount(self):
+        return self.product.price * self.quantity

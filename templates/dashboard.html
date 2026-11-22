@@ -4,49 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WISOFT LIMITED</title>
-    <link href="https://jsdelivr.net" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            background: #f8f9fa;
+        :root {
+            --dashboard-primary: #2563eb;
+            --dashboard-dark: #0f172a;
+            --dashboard-muted: #64748b;
         }
 
-        .container { color: #111827; }
-        .text-muted { color: #6b7280 !important; }
-        .card { background: rgba(255, 255, 255, 0.92); }
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 55%, #eef2ff 100%);
+            color: var(--dashboard-dark);
+            font-family: Arial, sans-serif;
+        }
+
+        #main-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1.25rem;
+            padding: 0.75rem 1.25rem;
+            background: #f3f4f6;
+        }
+        #main-navigation a {
+            color: #111827;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.4rem 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #main-navigation a:hover { background: #e5e7eb; }
+
+        .dashboard-shell { min-height: 100vh; padding: 3rem 1rem; }
+        .dashboard-header {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(10px);
+        }
+        .dashboard-header h2 { margin-bottom: 0.6rem; color: var(--dashboard-dark); }
+        .dashboard-header p { margin-bottom: 0.35rem; }
+
+        .dashboard-card {
+            border: 0;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 38px rgba(37, 99, 235, 0.16);
+        }
+        .dashboard-card .card-body { padding: 1.35rem; }
+        .dashboard-card h3 { color: var(--dashboard-primary); letter-spacing: -0.03em; }
+        .dashboard-card .badge { padding: 0.55rem 0.7rem; border-radius: 999px; }
+        .text-muted { color: var(--dashboard-muted) !important; }
+
+        @media (max-width: 576px) {
+            #main-navigation { justify-content: space-between; gap: 0.35rem; padding: 0.75rem 0.5rem; }
+            #main-navigation a { padding: 0.35rem 0.45rem; }
+            .dashboard-shell { padding: 1.25rem 0.75rem; }
+            .dashboard-header { padding: 1.1rem; }
+        }
     </style>
 </head>
-<body class="bg-light">
+<body>
+    <nav id="main-navigation">
+        <a href="/buy">Buy</a>
+        <a href="/order">Order</a>
+        <a href="/services">Services</a>
+        <a href="/about">About</a>
+        <a href="/logout">Logout</a>
+    </nav>
 
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Dashboard Overview</h2>
-        <span class="text-muted">Welcome, {{ request.user.username }} enjoy amazing services</span>
-        <p>Get quick insights into your account and activities with our dashboard. Explore the tiles below to access different sections and features.</p>
-        </div>
-        
-
-    </div>
-
-    <!-- Dashboard Tiles Grid -->
-    <div class="row g-4">
-        {% for tile in tiles %}
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <p class="text-muted text-uppercase small fw-semibold mb-1">
-                        {{ tile.title }}
-                    </p>
-                    <h3 class="fw-bold mb-2">{{ tile.value }}</h3>
-                    <span class="badge bg-{{ tile.badge_color }} bg-opacity-10 text-{{ tile.badge_color }}">
-                        {{ tile.subtitle }}
-                    </span>
-                </div>
+<main class="dashboard-shell">
+    <div class="container">
+        <div class="mb-4">
+            <div class="dashboard-header">
+                <h2 class="fw-bold">Dashboard Overview</h2>
+                <p class="text-muted">Welcome, {{ request.user.username }} — enjoy amazing services.</p>
+                <p class="text-muted">Get quick insights into your account and activities.</p>
             </div>
         </div>
-        {% endfor %}
-    </div>
-</div>
 
+        <div class="row g-4">
+            {% for tile in tiles %}
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <p class="text-muted text-uppercase small fw-semibold mb-2">{{ tile.title }}</p>
+                        <h3 class="fw-bold mb-2">{{ tile.value }}</h3>
+                        <span class="badge bg-{{ tile.badge_color }} bg-opacity-10 text-{{ tile.badge_color }}">
+                            {{ tile.subtitle }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">No dashboard information is available yet.</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
 </body>
 </html>

@@ -41,3 +41,34 @@ class RegistrationForm(forms.Form):
         except ValidationError as error:
             raise forms.ValidationError(error.messages)
         return password
+from django import forms
+
+
+class EnquiryForm(forms.Form):
+
+    name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={'placeholder': 'Your name'}
+        )
+    )
+
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={'placeholder': 'Your email'}
+        )
+    )
+
+    phone = forms.CharField(
+        max_length=30,
+        required=False
+    )
+
+    message = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'placeholder': 'Your message',
+                'rows': 5
+            }
+        )
+    )

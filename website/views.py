@@ -267,9 +267,8 @@ def buy(request):
                 f'You have ordered successfully. Total: KSh {total}. Wait as the company processes your order.',
             )
             request.session['selected_product_id'] = product.id
-            return redirect(f"/order/?product={product.id}&quantity={quantity}")
 
-        return redirect('buy')
+            return redirect('buy')
 
     products = Product.objects.select_related('category').all().order_by('-created_at')
     search = request.GET.get('q', '').strip()

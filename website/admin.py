@@ -11,13 +11,22 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sku', 'category', 'price', 'stock', 'is_low_stock')
+    list_display = ('name', 'sku', 'category', 'price', 'stock', 'is_low_stock', 'image_preview')
     list_filter = ('category',)
     search_fields = ('name', 'sku', 'barcode', 'description')
+    readonly_fields = ('image_preview',)
     fields = (
         'name', 'sku', 'barcode', 'category', 'description',
-        'price', 'stock', 'low_stock_alert', 'image',
+        'price', 'stock', 'low_stock_alert', 'image', 'image_preview',
     )
+
+    def image_preview(self, obj):
+        if obj.image:
+            from django.utils.html import format_html
+            return format_html('<img src="{}" style="height:70px;object-fit:cover;border-radius:6px">', obj.image.url)
+        return 'No image uploaded'
+
+    image_preview.short_description = 'Image Preview'
 
 
 @admin.register(StockMovement)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Product, StockMovement
+from .models import Category, Product, StockMovement, PortfolioRating
 
 
 @admin.register(Category)
@@ -33,3 +33,10 @@ class ProductAdmin(admin.ModelAdmin):
 class StockMovementAdmin(admin.ModelAdmin):
     list_display = ('product', 'movement_type', 'quantity', 'created_at')
     list_filter = ('movement_type',)
+
+
+@admin.register(PortfolioRating)
+class PortfolioRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'rating', 'created_at')
+    list_filter = ('rating',)
+    search_fields = ('user__username', 'comment')

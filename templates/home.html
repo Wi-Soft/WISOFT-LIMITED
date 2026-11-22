@@ -67,6 +67,36 @@
             </article>
             {% endfor %}
         </section>
+
+        <section class="hero" style="max-width:520px">
+            <h2>Rate WISOFT LIMITED</h2>
+            <p style="font-size:1.35rem;color:#f59e0b">★ ★ ★ ★ ★</p>
+            <p><strong>{{ rating_average|floatformat:1 }}</strong> out of 5 from {{ rating_count }} rating{{ rating_count|pluralize }}</p>
+
+            {% for message in messages %}
+            <p style="color:{% if message.tags == 'success' %}#15803d{% else %}#b91c1c{% endif %};font-weight:bold">{{ message }}</p>
+            {% endfor %}
+
+            {% if request.user.is_authenticated %}
+            <form method="post" style="display:grid;gap:.75rem;text-align:left">
+                {% csrf_token %}
+                <label for="rating"><strong>Your rating</strong></label>
+                <select id="rating" name="rating" required style="padding:.65rem;border:1px solid #d1d5db;border-radius:8px">
+                    <option value="">Choose 1–5 stars</option>
+                    <option value="5" {% if user_rating.rating == 5 %}selected{% endif %}>5 - Excellent</option>
+                    <option value="4" {% if user_rating.rating == 4 %}selected{% endif %}>4 - Very Good</option>
+                    <option value="3" {% if user_rating.rating == 3 %}selected{% endif %}>3 - Good</option>
+                    <option value="2" {% if user_rating.rating == 2 %}selected{% endif %}>2 - Fair</option>
+                    <option value="1" {% if user_rating.rating == 1 %}selected{% endif %}>1 - Poor</option>
+                </select>
+                <label for="comment"><strong>Review</strong></label>
+                <textarea id="comment" name="comment" rows="3" placeholder="Share your experience" style="padding:.65rem;border:1px solid #d1d5db;border-radius:8px">{{ user_rating.comment|default:'' }}</textarea>
+                <button type="submit" style="padding:.75rem;border:0;border-radius:8px;background:#2563eb;color:white;font-weight:bold">Submit Rating</button>
+            </form>
+            {% else %}
+            <a href="{% url 'signin' %}" style="display:inline-block;padding:.75rem 1rem;border-radius:8px;background:#2563eb;color:white;text-decoration:none;font-weight:bold">Sign in to rate</a>
+            {% endif %}
+        </section>
     </main>
 
     <script>

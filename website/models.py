@@ -1,8 +1,7 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
-
-from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -43,3 +42,17 @@ class StockMovement(models.Model):
     @property
     def total_amount(self):
         return self.product.price * self.quantity
+
+class PortfolioRating(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField()
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user'], name='unique_portfolio_rating_per_user')
+        ]
+
+    def __str__(self):
+        return f'{self.user.username}: {self.rating}/5'

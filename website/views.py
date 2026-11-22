@@ -7,6 +7,36 @@ from .forms import RegistrationForm
 
 
 def home(request):
+    from django.contrib import messages
+    from django.db.models import Avg, Count
+    from .models import PortfolioRating
+
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            rating = int(request.POST.get('rating', 0))
+        except (TypeError, ValueError):
+            rating = 0
+
+        if 1 <= rating <= 5:
+            PortfolioRating.objects.update_or_create(
+                user=request.user,
+                defaults={
+                    'rating': rating,
+                    'comment': request.POST.get('comment', '').strip(),
+                },
+            )
+            messages.success(request, 'Thank you for rating WISOFT LIMITED.')
+            return redirect('home')
+
+        messages.error(request, 'Please select a rating between 1 and 5.')
+
+    rating_stats = PortfolioRating.objects.aggregate(average=Avg('rating'), total=Count('id'))
+    rating_average = rating_stats['average'] or 0
+    rating_count = rating_stats['total']
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = PortfolioRating.objects.filter(user=request.user).first()
+
     tiles = [
         {
             'icon': '00',
@@ -72,7 +102,12 @@ def home(request):
             'color': '#8b5cf6',
         }
     ]
-    return render(request, 'home.html', {'tiles': tiles})
+    return render(request, 'home.html', {
+        'tiles': tiles,
+        'rating_average': rating_average,
+        'rating_count': rating_count,
+        'user_rating': user_rating,
+    })
 
 def fooder(request):
     return render(request, 'fooder.html')
@@ -130,38 +165,27 @@ def signout(request):
 @login_required(login_url='signin')
 def dashboard(request):
     from django.db.models import Sum
-    from .models import Product, StockMovement
+    from .models import Category, Product, StockMovement
 
     total_tiles = Product.objects.count()
     total_stock = Product.objects.aggregate(total=Sum('stock'))['total'] or 0
-    total_sales = StockMovement.objects.filter(movement_type='OUT').aggregate(total=Sum('quantity'))['total'] or 0
+    low_stock_count = sum(1 for product in Product.objects.all() if product.is_low_stock)
+    total_categories = Category.objects.count()
+    sales = StockMovement.objects.filter(movement_type='OUT')
+    total_sales = sales.aggregate(total=Sum('quantity'))['total'] or 0
+    total_orders = sales.count()
+    total_revenue = sum(order.total_amount for order in sales.select_related('product'))
     total_workers = User.objects.count()
 
     tiles = [
-        {
-            'title': 'Tiles',
-            'value': f'{total_tiles}',
-            'subtitle': 'Available tile products',
-            'badge_color': 'primary',
-        },
-        {
-            'title': 'Sales',
-            'value': f'{total_sales}',
-            'subtitle': 'Tiles sold',
-            'badge_color': 'success',
-        },
-        {
-            'title': 'Workers',
-            'value': f'{total_workers}',
-            'subtitle': 'Registered team members',
-            'badge_color': 'warning',
-        },
-        {
-            'title': 'Stock on Hand',
-            'value': f'{total_stock}',
-            'subtitle': 'Current available units',
-            'badge_color': 'danger',
-        },
+        {'title': 'Tile Products', 'value': f'{total_tiles}', 'subtitle': 'Admin-added tile products', 'badge_color': 'primary'},
+        {'title': 'Tiles Sold', 'value': f'{total_sales}', 'subtitle': 'Total units sold', 'badge_color': 'success'},
+        {'title': 'Sales Orders', 'value': f'{total_orders}', 'subtitle': 'Completed sales movements', 'badge_color': 'info'},
+        {'title': 'Sales Revenue', 'value': f'KES {total_revenue:,.2f}', 'subtitle': 'Total order value', 'badge_color': 'success'},
+        {'title': 'Workers', 'value': f'{total_workers}', 'subtitle': 'Registered users', 'badge_color': 'warning'},
+        {'title': 'Stock on Hand', 'value': f'{total_stock}', 'subtitle': 'Available units', 'badge_color': 'danger'},
+        {'title': 'Low Stock', 'value': f'{low_stock_count}', 'subtitle': 'Products needing attention', 'badge_color': 'danger'},
+        {'title': 'Categories', 'value': f'{total_categories}', 'subtitle': 'Tile categories', 'badge_color': 'secondary'},
     ]
     return render(request, 'dashboard.html', {'tiles': tiles})
 
